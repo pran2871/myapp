@@ -36,7 +36,7 @@ function EmailVerification(props) {
                         redirectToHome();
                         //props.showError(null)
                     } else{
-                        message.error(response.data.message);
+                      //  message.error(response.data.message);
                     }
                 })
                 .catch(function (error) {
@@ -44,7 +44,7 @@ function EmailVerification(props) {
                 });    
         } else {
             //props.showError('Please enter valid username and password')    
-            message.error(response.data.message);
+           // message.error(response.data.message);
         }
         
     }
