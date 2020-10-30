@@ -80,6 +80,7 @@ function LoginForm(props) {
                     localStorage.setItem('userContactNo',response.data.data.user.userContactNo);
                     localStorage.setItem('userID',response.data.data.user.userID);
                     localStorage.setItem('userName',response.data.data.user.userName);
+                    localStorage.setItem('password',payload.password);
 
                     redirectToHome();
                     //props.showError(null)

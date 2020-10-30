@@ -7,7 +7,6 @@
 import React from 'react';
 //  import { Tabs, TabList, TabPanel, Tab } from 'react-re-super-tabs'
 import { Tabs } from 'antd';
-import CustomTab from './CustomTab'
 import PickTemplate from './PickTemplate'
 import Contact from './Contact'
 

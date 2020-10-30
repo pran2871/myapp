@@ -76,6 +76,7 @@ class ManageUsers extends React.PureComponent {
 
                     const dataSource = [...this.state.dataSource];
                     this.setState({ dataSource: dataSource.filter(item => item.userRoleOrgID !== userRoleOrgID) });
+                    // this.refreshListingData();
                 }
             } else {
                 message.error("Something went wrong");
@@ -120,8 +121,6 @@ class ManageUsers extends React.PureComponent {
     }
 
     changeFilter = (event) => {
-        // event.preventDefault();
-        // alert(event.target.value)
         this.setState({ filterValue: event.target.value });
     }
 
@@ -178,16 +177,16 @@ class ManageUsers extends React.PureComponent {
                     return a.localeCompare(b)
                 }
             },
-            {
-                title: 'Created Date',
-                dataIndex: 'createdAt',
-                key: 'createdAt',
-                sorter: (a, b) => {
-                    a = a.createdAt || '';
-                    b = b.createdAt || '';
-                    return a.localeCompare(b)
-                },
-            },
+            // {
+            //     title: 'Created Date',
+            //     dataIndex: 'createdAt',
+            //     key: 'createdAt',
+            //     sorter: (a, b) => {
+            //         a = a.createdAt || '';
+            //         b = b.createdAt || '';
+            //         return a.localeCompare(b)
+            //     },
+            // },
             {
                 title: 'Actions',
                 dataIndex: 'userRoleOrgID',

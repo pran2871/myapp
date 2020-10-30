@@ -71,7 +71,7 @@ class AppLayout extends React.PureComponent { // eslint-disable-line react/prefe
             //     name: 'Profile',
             //     icon: 'user',
             //     component: Account,
-            //     validUsers: ['superAdmin', 'admin', 'coach']
+            //     validUsers: ['superadmin', 'admin', 'coach']
             // },
             {
                 path: '/manageUser',

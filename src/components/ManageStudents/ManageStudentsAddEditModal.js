@@ -214,8 +214,8 @@ class ManageStudentsAddEdit extends React.PureComponent { // eslint-disable-line
             "studentReferenceNumber" : this.state.addEditingStudentData.referenceNumber,
             "studentName" : this.state.addEditingStudentData.name,
             "studentContactNo" : this.state.addEditingStudentData.contactNumber,
-            "userID":this.state.addEditingStudentData.coach,
-            "orgID":this.state.addEditingStudentData.organization
+            "userID":this.state.addEditingStudentData.coachName,
+            "orgID":this.state.addEditingStudentData.organizationName
         }
         console.log(payload)
         if(this.props.addEditModalStatus === 'add'){
@@ -310,7 +310,7 @@ class ManageStudentsAddEdit extends React.PureComponent { // eslint-disable-line
                         allowClear
                         showArrow
                         onChangeHandler={(value) => this.changeFilter(value, 'organization')}
-                        value={addEditingStudentData.organization}
+                        value={addEditingStudentData.organizationName}
                         placeholder="Select Organization"
                         options={organizationList.map((organizationData) => {
                             return {
@@ -332,12 +332,12 @@ class ManageStudentsAddEdit extends React.PureComponent { // eslint-disable-line
                         allowClear
                         showArrow
                         onChangeHandler={(value) => this.changeFilter(value, 'coach')}
-                        value={addEditingStudentData.coach}
+                        value={addEditingStudentData.coachName}
                         placeholder="Select Coach"
                         options={coachList.map((CoachData) => {
                             return {
-                                id: CoachData.userID,
-                                label: CoachData.userName,
+                                id: CoachData.coachID,
+                                label: CoachData.coachName,
                             }
                         })}
                     />

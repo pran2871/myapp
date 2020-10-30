@@ -44,7 +44,8 @@ function ForgotPassword(props) {
            }
            localStorage.setItem('email',payload.email)
             //http://localhost:8080/login/send-mail/?email_id=akashmalla07@gmail.com
-            axios.put("/login/send-mail/?email_id="+payload.email, payload)
+            
+            axios.put("/login/sendMail?email_id="+payload.email, payload)
                 .then(function (response) {
                     console.log(response)
                     if(response.status === 200){

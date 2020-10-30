@@ -99,12 +99,6 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
 
       console.log('response.data.data : ', response);
       // [{name: 'a', b: 'b'}, {name: 'c', d: 'd'}]
-
-
-      const parsedData  = response.map((rowData) => {
-        return Object.values(rowData).map((value) => `${value}`);
-      });
-      console.log('setting data : ', parsedData);
       this.setState({ dataSource: response });
     })
 
@@ -197,13 +191,13 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
             // },
             {
                 title: 'Organization Name',
-                dataIndex: 'orgID',
-                key: 'organization',
+                dataIndex: 'organizationName',
+                key: 'organizationName',
             },
             {
                 title: 'Coach Name',
-                dataIndex: 'userID',
-                key: 'userID',
+                dataIndex: 'coachName',
+                key: 'coachName',
             },
             {
                 title: 'Actions',

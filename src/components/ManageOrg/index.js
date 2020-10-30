@@ -108,7 +108,7 @@ class ManageOrg extends React.PureComponent { // eslint-disable-line react/prefe
         console.log(this.state.deleteData)
         console.log(data)
         //?email_id="+payload.email
-        const apiCallPromise = axios.delete("manageOrganization?orgID="+data)
+        const apiCallPromise = axios.delete("manageOrganization/delete?orgID="+data)
         .then(function (response) {
             console.log("inside delete function")
             console.log(response)

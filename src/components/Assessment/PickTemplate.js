@@ -55,17 +55,17 @@ class PickTemplate extends React.PureComponent { // eslint-disable-line react/pr
        
 
        // http://localhost:8080/manageStudents/getAll
-        const apiCallPromise = axios.get("/manageStudents/getAll")
+        const apiCallPromise = axios.get("/manageTemplate")
         .then(function (response) {
             console.log(response)
             console.log(response.status)
-            console.log(response.data.data)
+            console.log(response.data)
             //console.log(this.state.dataSource)
             console.log("akash")
         if(response.status === 200){
             //this.setState({ dataSource: response.data.data });
             //this.state.dataSource = response.data.data;
-            return response.data.data;
+            return response.data;
         } else{
             console.log('error');
         }
@@ -80,11 +80,6 @@ class PickTemplate extends React.PureComponent { // eslint-disable-line react/pr
       console.log('response.data.data : ', response);
       // [{name: 'a', b: 'b'}, {name: 'c', d: 'd'}]
 
-
-      const parsedData  = response.map((rowData) => {
-        return Object.values(rowData).map((value) => `${value}`);
-      });
-      console.log('setting data : ', parsedData);
       this.setState({ dataSource: response });
     })
 
@@ -163,14 +158,14 @@ class PickTemplate extends React.PureComponent { // eslint-disable-line react/pr
         const manageStudentsColumns = [
             {
                 title: 'Template Name',
-                dataIndex: 'studentName',
-                key: 'studentName',
+                dataIndex: 'templateName',
+                key: 'templateName',
             
             },
             {
                 title: 'Created By',
-                dataIndex: 'studentReferenceNumber',
-                key: 'studentReferenceNumber',
+                dataIndex: 'createdBY.userName',
+                key: 'createdBY.userName',
             },
             {
               title: '',

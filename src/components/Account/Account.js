@@ -43,12 +43,12 @@ function Account(props){
         console.log(userData)
         //setting api response to the form values
         setFieldValues({
-            name : userData.userName || '',
+            name : localStorage.getItem('userName') || '',
         
-            contact: userData.userContactNo || '',
-            email: userData.emailID || '',
-            organization: userData.orgName || '',
-            role: userData.roleName || '',
+            contact: localStorage.getItem('userContactNo') || '',
+            email: localStorage.getItem('emailID') || '',
+           // organization: userData.orgName || '',
+           // role: userData.roleName || '',
             // id: response.id,
         });
 
@@ -110,7 +110,7 @@ function Account(props){
             "userName":fieldValues.name,
             "emailID":fieldValues.email,
             
-            
+            "password":localStorage.getItem('password')
             
         }
         console.log(payload);
@@ -140,7 +140,7 @@ function Account(props){
             });
             reply.then((response) => {
                 message.success("Organisation successfully added");
-                //this.props.updateListingData();
+                props.history.push('/landing');
             })
     }
 

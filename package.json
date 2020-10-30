@@ -2,7 +2,7 @@
   "name": "myapp",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://ec2-34-201-220-167.compute-1.amazonaws.com:8080/",
+  "proxy": "http://ec2-18-234-40-147.compute-1.amazonaws.com:8080/",
   "dependencies": {
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",

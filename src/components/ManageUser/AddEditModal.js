@@ -61,11 +61,10 @@ class addEdit extends React.PureComponent {
         }});
     }
 
-    refreshListingData = () => {
-        // this.cancelAddEdit();
-        // new manageUsers().fetchUsersList();
-        window.location.reload();
-    }
+    // refreshListingData = () => {
+    //     this.fetchUsersList();
+    //     this.cancelAddEdit();
+    // }
 
     cancelAddEdit = () => {
         this.setState({
@@ -91,11 +90,17 @@ class addEdit extends React.PureComponent {
                 }
             }
 
-            axios.post("/manageUser/", newUser).then(response => {
+            const addUserResponse = axios.post("/manageUser/", newUser).then(function (response) {
+                return response;
+            });
+
+            addUserResponse.then((response) => {
                 if (response.status === 200) {
                     if (response.data.status === "error") {
                         message.error(response.data.message);
                     } else if (response.data.status === "success") {
+                        this.props.refreshListingData();
+
                         if (response.data.message != "") {
                             message.success(response.data.message);
                         }
@@ -125,11 +130,17 @@ class addEdit extends React.PureComponent {
                 }
             }
 
-            axios.patch("/manageUser/", newUser).then(function (response) {
+            const updateUserResponse = axios.patch("/manageUser/", newUser).then(function (response) {
+                return response;
+            });
+
+            updateUserResponse.then((response) => {
                 if (response.status === 200) {
                     if (response.data.status === "error") {
                         message.error(response.data.message);
                     } else if (response.data.status === "success") {
+                        this.props.refreshListingData();
+
                         if (response.data.message != "") {
                             message.success(response.data.message);
                         }
@@ -142,8 +153,6 @@ class addEdit extends React.PureComponent {
                 message.error("Unable to contact server");
             });
         }
-
-        this.refreshListingData();
     }
 
     render() {
@@ -214,7 +223,7 @@ class addEdit extends React.PureComponent {
                         allowClear
                         showArrow
                         onChangeHandler={(value) => this.changeFilter(value, 'orgID')}
-                        value={addEditUserData.orgID}
+                        value={addEditUserData.roleName.toLowerCase() !== 'superadmin' ? addEditUserData.orgID : ''}
                         placeholder="Select Organization"
                         options={organizationList.map((organizationData) => {
                             return {

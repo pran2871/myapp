@@ -47,7 +47,7 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
 
         console.log("inside getStudentApi Call function 2")
        // http://localhost:8080/manageStudents/getAll
-        const apiCallPromise = axios.get("/manageTemplate/")
+        const apiCallPromise = axios.get("/manageTemplate")
         .then(function (response) {
             console.log(response)
             console.log(response.status)
@@ -184,9 +184,9 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
                                     <Icon type={'delete'} />
                                 </Popconfirm>
                             </IconContainer>
-                            <IconContainer>
+                            {/* <IconContainer>
                                 <Icon type={'edit'} onClick={() => this.editStudentData(studentData)} />
-                            </IconContainer>
+                            </IconContainer> */}
                         </ActionContainer>
                     );
                 }
@@ -209,12 +209,12 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
                         value={filterValue}
                         placeholder="Enter Filter"
                     />
-                    <Button
+                    {/* <Button
                         type="primary"
                         onClick={this.createNewStudent}
                     >
                         Add New Template
-                    </Button>
+                    </Button> */}
                 </InputFilterContainer>
                 <Table
                     dataSource={filteredDataSource}

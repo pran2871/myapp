@@ -56,9 +56,17 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
         if(response.status === 200){
             //this.setState({ dataSource: response.data.data });
             //this.state.dataSource = response.data.data;
+            if(response.data.status ==='error')
+            {                        
+                console.log(response.data.message);
+                message.error(response.data.message);
+                
+            }else{
             return response.data.data;
+            }
         } else{
             console.log('error');
+            message.error(response.data.message);
         }
     })
     .catch(function (error) {
@@ -161,13 +169,13 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
             // },
             {
                 title: 'Organization Name',
-                dataIndex: 'orgID',
-                key: 'organization',
+                dataIndex: 'organizationName',
+                key: 'organizationName',
             },
             {
                 title: 'Coach Name',
-                dataIndex: 'userID',
-                key: 'userID',
+                dataIndex: 'coachName',
+                key: 'coachName',
             },
             {
                 title: 'Actions',
