@@ -5,11 +5,11 @@
  */
 
 import React from 'react';
-import { Table, Button, Icon, Popconfirm, message } from 'antd';
+import { Table, Button, Icon, Popconfirm, message, Tooltip } from 'antd';
 import axios from 'axios';
 import {
     manageStudentsApiResponse,
-    
+
 } from './ManageStudents.constants';
 
 import ManageStudentsAddEditModal from './ManageStudentsAddEditModal';
@@ -25,6 +25,8 @@ import {
     ActionContainer,
 } from './ManageStudents.styled';
 
+const MAX_CHAR_TO_ELIPSE = 10;
+
 class ManageStudents extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
     constructor(props) {
         super(props);
@@ -33,8 +35,8 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
             dataSource: [],
             addEditModalStatus: '',
             addEditingStudentData: null,
-            deleteData:null,
-            
+            deleteData: null,
+
         }
     }
 
@@ -46,34 +48,34 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
         //  ToDo: api call for the list of students data and save the data in this.state.dataSource
 
         console.log("inside getStudentApi Call function 2")
-       // http://localhost:8080/manageStudents/getAll
+        // http://localhost:8080/manageStudents/getAll
         const apiCallPromise = axios.get("/manageTemplate")
-        .then(function (response) {
-            console.log(response)
-            console.log(response.status)
-            console.log(response.data)
-            //console.log(this.state.dataSource)
-            console.log("akash")
-        if(response.status === 200){
-            //this.setState({ dataSource: response.data.data });
-            //this.state.dataSource = response.data.data;
-            return response.data;
-        } else{
-            console.log('error');
-        }
-    })
-    .catch(function (error) {
-        console.log(error);
-    });  
+            .then(function (response) {
+                console.log(response)
+                console.log(response.status)
+                console.log(response.data)
+                //console.log(this.state.dataSource)
+                console.log("akash")
+                if (response.status === 200) {
+                    //this.setState({ dataSource: response.data.data });
+                    //this.state.dataSource = response.data.data;
+                    return response.data;
+                } else {
+                    console.log('error');
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
 
-    // using .then, create a new apiCallPromise which extracts the data
-    apiCallPromise.then((response) => {
+        // using .then, create a new apiCallPromise which extracts the data
+        apiCallPromise.then((response) => {
 
-      console.log('response.data.data : ', response);
-      // [{name: 'a', b: 'b'}, {name: 'c', d: 'd'}]
+            console.log('response.data.data : ', response);
+            // [{name: 'a', b: 'b'}, {name: 'c', d: 'd'}]
 
-      this.setState({ dataSource: response });
-    })
+            this.setState({ dataSource: response });
+        })
 
     }
 
@@ -101,7 +103,7 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
 
     deleteStudent = (data) => {
         //  ToDo: delete api call
-        console.log("delete"+data)
+        console.log("delete" + data)
         this.setState({
             addEditModalStatus: '',
             deleteData: data
@@ -109,32 +111,32 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
         console.log(this.state.deleteData)
         console.log(data)
         //?email_id="+payload.email
-        const apiCallPromise = axios.delete("manageTemplate/"+data)
-        .then(function (response) {
-            console.log("inside delete function")
-            console.log(response)
-            console.log(response.status)
-            console.log(response.data.data)
-            //console.log(this.state.dataSource)
-            console.log("akash")
-        if(response.status === 200){
-            //this.setState({ dataSource: response.data.data });
-            //this.state.dataSource = response.data.data;
-            return response.data.data;
-        } else{
-            console.log('error');
-        }
-    })
-    .catch(function (error) {
-        console.log(error);
-    });
+        const apiCallPromise = axios.delete("manageTemplate/" + data)
+            .then(function (response) {
+                console.log("inside delete function")
+                console.log(response)
+                console.log(response.status)
+                console.log(response.data.data)
+                //console.log(this.state.dataSource)
+                console.log("akash")
+                if (response.status === 200) {
+                    //this.setState({ dataSource: response.data.data });
+                    //this.state.dataSource = response.data.data;
+                    return response.data.data;
+                } else {
+                    console.log('error');
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
 
-    apiCallPromise.then((response) => {
-        message.success("Template successfully deleted");
-        this.getStudentListApiCAllFunction();
-    })
+        apiCallPromise.then((response) => {
+            message.success("Template successfully deleted");
+            this.getStudentListApiCAllFunction();
+        })
 
-        
+
     }
 
     updateListingData = () => {
@@ -158,20 +160,28 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
             },
             {
                 title: 'Assigned To',
-                dataIndex: 'assignedTo.userName[0]',
-                key: 'assignedTo.userName[0]',
+                dataIndex: 'assignedTo',
+                key: 'assignedTo',
+                render: (assignedTo) => {
+                    const fullText = assignedTo.map(ob => ob.userName).toString();
+                    return <Tooltip placement='bottomLeft' title={<div>{assignedTo.map(ob => {
+                        return <React.Fragment>{ob.userName} <br /></React.Fragment>
+                    })}</div>}>
+                        <span style={{cursor:'default'}}>{fullText.substr(0, MAX_CHAR_TO_ELIPSE) + '...'}</span>
+                    </Tooltip>
+                }
             },
             {
                 title: 'Total Questions',
                 dataIndex: 'questionsList.length',
                 key: 'questionsList.length',
             },
-           
+
             {
                 title: 'Actions',
                 dataIndex: 'templateID',
                 key: 'templateID',
-                render: (templateID,studentData) => {
+                render: (templateID, studentData) => {
                     return (
                         <ActionContainer>
                             <IconContainer>

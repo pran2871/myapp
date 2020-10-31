@@ -70,7 +70,7 @@ function LoginForm(props) {
                     // console.log(response.data.data.data.user.userContactNo)
                     // console.log(response.data.data.data.user.userID)
                     // console.log(response.data.data.data.user.userName)
-                    // localStorage.setItem(ACCESS_TOKEN_NAME,response.data.token);
+                    localStorage.setItem(ACCESS_TOKEN_NAME,response.data.token);
                     console.log("success");
                     console.log(response.data);
                     localStorage.setItem('orgID',response.data.data.organization.orgID);

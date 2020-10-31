@@ -11,7 +11,7 @@ import AuthenticatedRoute from './components/AuthenticatedRoute';
 import AppLayout from './components/AppLayout';
 
 import {
-  BrowserRouter as Router,
+  HashRouter as Router,
   Switch,
   Route,
   Redirect,
