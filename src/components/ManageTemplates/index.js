@@ -1,61 +1,54 @@
 /**
  *
- * ManageStudents
+ * ManageTemplates
  *
  */
 
-import React from 'react';
-import { Table, Button, Icon, Popconfirm, message, Tooltip } from 'antd';
+import { Button, Icon, message, Popconfirm, Table, Tooltip } from 'antd';
 import axios from 'axios';
+import React from 'react';
 import {
-    manageStudentsApiResponse,
-
-} from './ManageStudents.constants';
-
-import ManageStudentsAddEditModal from './ManageStudentsAddEditModal';
-
-import {
-    filterArray,
+    filterArray
 } from '../../utils/utilityFunctions';
-
+import './manageTemplate.css';
 import {
-    InputFilterContainer,
-    InputField,
-    IconContainer,
-    ActionContainer,
-} from './ManageStudents.styled';
+    ActionContainer, IconContainer, InputField, InputFilterContainer
+} from './ManageTemplates.styled';
+import ManageTemplatesCreateEditModal from './ManageTemplatesCreateEditModal';
+
+
 
 const MAX_CHAR_TO_ELIPSE = 10;
 
-class ManageStudents extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+class ManageTemplates extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
     constructor(props) {
         super(props);
         this.state = {
             filterValue: '',
             dataSource: [],
             addEditModalStatus: '',
-            addEditingStudentData: null,
+            addEditingTemplateData: null,
             deleteData: null,
 
         }
     }
 
     componentDidMount() {
-        this.getStudentListApiCAllFunction();
+        this.getTemplateListApiCAllFunction();
     }
 
-    getStudentListApiCAllFunction = () => {
-        //  ToDo: api call for the list of students data and save the data in this.state.dataSource
+    getTemplateListApiCAllFunction = () => {
+        //  ToDo: api call for the list of templates data and save the data in this.state.dataSource
 
-        console.log("inside getStudentApi Call function 2")
-        // http://localhost:8080/manageStudents/getAll
+        console.log("inside getTemplateApi Call function 2")
+        // http://localhost:8080/manageTemplate
         const apiCallPromise = axios.get("/manageTemplate")
             .then(function (response) {
                 console.log(response)
                 console.log(response.status)
-                console.log(response.data)
+                console.log("response", response.data)
                 //console.log(this.state.dataSource)
-                console.log("akash")
+                console.log("pran")
                 if (response.status === 200) {
                     //this.setState({ dataSource: response.data.data });
                     //this.state.dataSource = response.data.data;
@@ -83,25 +76,27 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
         this.setState({ filterValue: event.target.value });
     }
 
-    editStudentData = (data) => {
+    editTemplatetData = (data) => {
+        alert(data.templateName)
         this.setState({
             addEditModalStatus: 'edit',
-            addEditingStudentData: data
+            addEditingTemplateData: data,
+
         });
     }
 
-    createNewStudent = () => {
+    createNewTemplate = () => {
         this.setState({ addEditModalStatus: 'add' });
     }
-
     cancelAddEdit = () => {
         this.setState({
             addEditModalStatus: '',
-            addEditingStudentData: null
+            addEditingTemplateData: null
         });
     }
 
-    deleteStudent = (data) => {
+
+    deleteTemplate = (data) => {
         //  ToDo: delete api call
         console.log("delete" + data)
         this.setState({
@@ -133,7 +128,7 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
 
         apiCallPromise.then((response) => {
             message.success("Template successfully deleted");
-            this.getStudentListApiCAllFunction();
+            this.getTemplateListApiCAllFunction();
         })
 
 
@@ -141,13 +136,13 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
 
     updateListingData = () => {
         console.log("inside the index page");
-        this.getStudentListApiCAllFunction();
+        this.getTemplateListApiCAllFunction();
         this.cancelAddEdit();
     }
 
     render() {
 
-        const manageStudentsColumns = [
+        const manageTemplatesColumns = [
             {
                 title: 'Template Name',
                 dataIndex: 'templateName',
@@ -167,7 +162,7 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
                     return <Tooltip placement='bottomLeft' title={<div>{assignedTo.map(ob => {
                         return <React.Fragment>{ob.userName} <br /></React.Fragment>
                     })}</div>}>
-                        <span style={{cursor:'default'}}>{fullText.substr(0, MAX_CHAR_TO_ELIPSE) + '...'}</span>
+                        <span style={{ cursor: 'default' }}>{fullText.substr(0, MAX_CHAR_TO_ELIPSE) + '...'}</span>
                     </Tooltip>
                 }
             },
@@ -181,34 +176,34 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
                 title: 'Actions',
                 dataIndex: 'templateID',
                 key: 'templateID',
-                render: (templateID, studentData) => {
+                render: (templateID, templateData) => {
                     return (
                         <ActionContainer>
                             <IconContainer>
                                 <Popconfirm
-                                    title={'Are you sure ?'}
-                                    onConfirm={() => this.deleteStudent(templateID)}
+                                    title={'Are you sure you want to delete template ?'}
+                                    onConfirm={() => this.deleteTemplate(templateID)}
                                     okText="Yes"
                                     cancelText="No"
                                 >
                                     <Icon type={'delete'} />
                                 </Popconfirm>
                             </IconContainer>
-                            {/* <IconContainer>
-                                <Icon type={'edit'} onClick={() => this.editStudentData(studentData)} />
-                            </IconContainer> */}
+                            <IconContainer>
+                                <Icon type={'edit'} onClick={() => this.editTemplatetData(templateData)} />
+                            </IconContainer>
                         </ActionContainer>
                     );
                 }
             },
         ];
 
-        const { filterValue, dataSource, addEditModalStatus = '', addEditingStudentData } = this.state;
+        const { filterValue, dataSource, addEditModalStatus = '', addEditingTemplateData } = this.state;
 
         let filteredDataSource = dataSource;
 
         if (filterValue && filterValue.length) {
-            filteredDataSource = filterArray(dataSource, filterValue, ['studentName', 'studentReferenceNumber', 'studentContactNo', 'organization.orgName', 'userID']);
+            filteredDataSource = filterArray(dataSource, filterValue, ['templateName', 'createdBY.userName']);
         }
 
         return (
@@ -219,29 +214,33 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
                         value={filterValue}
                         placeholder="Enter Filter"
                     />
-                    {/* <Button
+                    <Button
                         type="primary"
-                        onClick={this.createNewStudent}
+                        onClick={this.createNewTemplate}
                     >
-                        Add New Template
-                    </Button> */}
+                        Create Template
+                    </Button>
                 </InputFilterContainer>
                 <Table
                     dataSource={filteredDataSource}
-                    columns={manageStudentsColumns}
+                    columns={manageTemplatesColumns}
                 />
                 {addEditModalStatus && addEditModalStatus.length ? (
-                    <ManageStudentsAddEditModal
+                    <ManageTemplatesCreateEditModal
                         addEditModalStatus={addEditModalStatus}
-                        addEditingStudentData={addEditingStudentData}
+                        addEditingTemplateData={addEditingTemplateData}
                         cancelAddEdit={this.cancelAddEdit}
                         updateListingData={this.updateListingData}
                     />
                 ) : null}
+
+
+
+
             </div>
         )
     }
 }
 
 
-export default ManageStudents;
+export default ManageTemplates;

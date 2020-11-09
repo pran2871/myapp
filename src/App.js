@@ -12,6 +12,7 @@ import AppLayout from './components/AppLayout';
 
 import {
   HashRouter as Router,
+  //BrowserRouter as Router,
   Switch,
   Route,
   Redirect,

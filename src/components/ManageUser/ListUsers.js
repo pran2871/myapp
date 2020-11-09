@@ -1,5 +1,6 @@
 import React from 'react';
-import { Table, Button, Icon, Popconfirm, message } from 'antd';
+import { Table, Button, Popconfirm, message } from 'antd';
+import Icon from '@ant-design/icons'
 import axios from 'axios';
 import AddEditModal from './AddEditModal';
 import './ListUsers.css'
