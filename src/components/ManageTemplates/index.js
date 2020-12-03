@@ -4,7 +4,9 @@
  *
  */
 
-import { Button, Icon, message, Popconfirm, Table, Tooltip } from 'antd';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { Table } from "ant-table-extensions";
+import { Button, message, Popconfirm, Tooltip } from 'antd';
 import axios from 'axios';
 import React from 'react';
 import {
@@ -15,7 +17,6 @@ import {
     ActionContainer, IconContainer, InputField, InputFilterContainer
 } from './ManageTemplates.styled';
 import ManageTemplatesCreateEditModal from './ManageTemplatesCreateEditModal';
-
 
 
 const MAX_CHAR_TO_ELIPSE = 10;
@@ -77,7 +78,7 @@ class ManageTemplates extends React.PureComponent { // eslint-disable-line react
     }
 
     editTemplatetData = (data) => {
-        alert(data.templateName)
+        // alert(data.templateName)
         this.setState({
             addEditModalStatus: 'edit',
             addEditingTemplateData: data,
@@ -147,11 +148,22 @@ class ManageTemplates extends React.PureComponent { // eslint-disable-line react
                 title: 'Template Name',
                 dataIndex: 'templateName',
                 key: 'templateName',
+                sorter: (a, b) => {
+                    a = a.templateName || '';
+                    b = b.templateName || '';
+                    return a.localeCompare(b)
+                },
             },
             {
                 title: 'Created By',
-                dataIndex: 'createdBY.userName',
+                dataIndex: 'createdBY',
                 key: 'createdBY',
+                sorter: (a, b) => {
+                    a = a.createdBY.userName || '';
+                    b = b.createdBY.userName || '';
+                    return a.localeCompare(b)
+                },
+                render: text => <span>{text.userName}</span>
             },
             {
                 title: 'Assigned To',
@@ -168,8 +180,10 @@ class ManageTemplates extends React.PureComponent { // eslint-disable-line react
             },
             {
                 title: 'Total Questions',
-                dataIndex: 'questionsList.length',
-                key: 'questionsList.length',
+                dataIndex: 'questionsList',
+                key: 'questionsList',
+                render: text => <span>{text.length}</span>
+
             },
 
             {
@@ -186,11 +200,11 @@ class ManageTemplates extends React.PureComponent { // eslint-disable-line react
                                     okText="Yes"
                                     cancelText="No"
                                 >
-                                    <Icon type={'delete'} />
+                                    <DeleteOutlined />
                                 </Popconfirm>
                             </IconContainer>
                             <IconContainer>
-                                <Icon type={'edit'} onClick={() => this.editTemplatetData(templateData)} />
+                                <EditOutlined onClick={() => this.editTemplatetData(templateData)} />
                             </IconContainer>
                         </ActionContainer>
                     );
@@ -208,13 +222,19 @@ class ManageTemplates extends React.PureComponent { // eslint-disable-line react
 
         return (
             <div>
-                <InputFilterContainer>
-                    <InputField
-                        onChange={this.changeFilter}
-                        value={filterValue}
-                        placeholder="Enter Filter"
-                    />
-                    <Button
+                <InputFilterContainer style={{
+                    display: "flex", marginBottom: 15,
+                    justifyContent: "space-between", width: '100%'
+                }}>
+                    <div >
+                        <InputField style={{ width: 700 }}
+                            onChange={this.changeFilter}
+                            value={filterValue}
+                            placeholder="Enter Filter"
+
+                        />
+                    </div>
+                    <Button style={{ alignSelf: 'flex-end', marginRight: 10, position: 'relative' }}
                         type="primary"
                         onClick={this.createNewTemplate}
                     >

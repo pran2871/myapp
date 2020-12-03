@@ -4,29 +4,27 @@
  *
  */
 
+import { DashboardOutlined, GlobalOutlined, LineChartOutlined, ProjectOutlined, QuestionCircleOutlined, ReconciliationOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons';
+import { Button, Layout, Menu, Modal } from 'antd';
 import React from 'react';
-import { Route, Switch, Link, Redirect } from 'react-router-dom';
-import { Layout, Menu, Icon , Dropdown, Button} from 'antd';
-
-import {
-    AppLayoutContainer,
-} from './AppLayout.styled';
-
-import Landing from '../Landing/Landing';
+import { Route, Switch } from 'react-router-dom';
 import Account from '../Account/Account';
-import ManageOrg from '../ManageOrg';
-import ManageUser from '../ManageUser/ListUsers';
-import ManageStudents from '../ManageStudents';
 import Assessment from '../Assessment';
+import Landing from '../Landing/Landing';
+import ManageOrg from '../ManageOrg';
 import ManageQuestions from '../ManageQuestions';
+import ManageStudents from '../ManageStudents';
 import ManageTemplates from '../ManageTemplates';
-
+import ManageUser from '../ManageUser/ListUsers';
+import ViewReport from '../ViewReport';
 import {
-    AppLayoutSider,
-    PageContainer,
+    AppLayoutContainer, AppLayoutSider,
+    PageContainer
 } from './AppLayout.styled';
 
-import { DownOutlined } from '@ant-design/icons';
+
+
+
 
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -35,12 +33,15 @@ class AppLayout extends React.PureComponent { // eslint-disable-line react/prefe
         super(props);
         this.state = {
             isSliderCollapsed: false,
+            changeRoutData: null,
+            alertModalVisibilityStatus: false,
         }
     }
 
 
     handleSignoutClick = () => {
-        console.log("sign out click");
+        console.log("sign out clicked");
+        localStorage.clear();
         this.props.history.push(`/login`);
     }
 
@@ -53,65 +54,91 @@ class AppLayout extends React.PureComponent { // eslint-disable-line react/prefe
         this.setState({ isSliderCollapsed: !this.state.isSliderCollapsed });
     }
 
+    navigatePage = (routeData) => {
+        console.log(localStorage.getItem('formInProgress'));
+        if (localStorage.getItem('formInProgress')) {
+            this.setState({ changeRoutData: routeData, alertModalVisibilityStatus: true });
+        } else {
+            this.props.history.push(routeData.path);
+        }
+    }
+
+    handleOk = () => {
+        localStorage.removeItem('formInProgress');
+        this.props.history.push(this.state.changeRoutData.path);
+        this.setState({ changeRoutData: null, alertModalVisibilityStatus: false });
+    }
+
+    handleCancel = () => {
+        this.setState({ changeRoutData: null, alertModalVisibilityStatus: false });
+    }
+
     render() {
 
-        
+
         const userType = localStorage.getItem('roleName');
-        //const userType = 'superAdmin';
+        
         const routes = [
             {
                 path: '/dashboard',
                 name: 'Dashboard',
-                icon: 'dashboard',
+                icon: <DashboardOutlined />,
                 component: Landing,
-                validUsers: ['superadmin', 'admin', 'coach']
+                validUsers: ['ceo', 'superadmin', 'admin', 'coach']
             },
             // {
             //     path: '/account',
             //     name: 'Profile',
             //     icon: 'user',
             //     component: Account,
-            //     validUsers: ['superadmin', 'admin', 'coach']
+            //     validUsers: ['ceo', 'superadmin', 'admin', 'coach']
             // },
             {
                 path: '/manageUser',
                 name: 'Manage Users',
-                icon: 'team',
+                icon: <TeamOutlined />,
                 component: ManageUser,
-                validUsers: ['superadmin', 'admin']
+                validUsers: ['ceo', 'superadmin', 'admin']
             },
             {
                 path: '/manageOrganizations',
                 name: 'Manage Organizations',
-                icon: 'global',
+                icon: <GlobalOutlined />,
                 component: ManageOrg,
-                validUsers: ['superadmin']
+                validUsers: ['ceo', 'superadmin']
             },
             {
                 path: '/manageTemplates',
                 name: 'Manage Templates',
-                icon: 'book',
+                icon: <ProjectOutlined />,
                 component: ManageTemplates,
-                validUsers: ['superadmin', 'admin','coach']
+                validUsers: ['ceo', 'superadmin', 'admin', 'coach']
             }, {
                 path: '/manageStudents',
                 name: 'Manage Students',
-                icon: 'user',
+                icon: <UserOutlined />,
                 component: ManageStudents,
-                validUsers: ['superadmin', 'admin', 'coach']
+                validUsers: ['ceo', 'superadmin', 'admin', 'coach']
             }, {
                 path: '/assessment',
                 name: 'Manage Assessment',
-                icon: 'book',
+                icon: <ReconciliationOutlined />,
                 component: Assessment,
-                validUsers: ['superadmin', 'admin', 'coach'],
+                validUsers: ['ceo', 'superadmin', 'admin', 'coach'],
                 hasChildren: true,
             }, {
                 path: '/manageQuestions',
                 name: 'Manage Questions',
-                icon: 'question-circle',
+                icon: <QuestionCircleOutlined />,
                 component: ManageQuestions,
-                validUsers: ['superadmin', 'admin', 'coach'],
+                validUsers: ['ceo', 'superadmin', 'admin', 'coach'],
+            }, {
+
+                path: '/viewreport',
+                name: 'View Report',
+                icon: <LineChartOutlined />,
+                component: ViewReport,
+                validUsers: ['ceo', 'superadmin', 'admin', 'coach'],
             }
         ];
 
@@ -135,22 +162,32 @@ class AppLayout extends React.PureComponent { // eslint-disable-line react/prefe
 
         const menu = (
             <Menu>
-              <Menu.Item>
-                <a target="_blank" rel="noopener noreferrer" onClick={this.handleAccountClick} >
-                  Profile
+                <Menu.Item>
+                    <a target="_blank" rel="noopener noreferrer" onClick={this.handleAccountClick} >
+                        Profile
                 </a>
-              </Menu.Item>
-              <Menu.Item>
-                <a target="_blank" rel="noopener noreferrer" onClick={this.handleSignoutClick} >
-                  Sign out
+                </Menu.Item>
+                <Menu.Item>
+                    <a target="_blank" rel="noopener noreferrer" onClick={this.handleSignoutClick} >
+                        Sign out
                 </a>
-              </Menu.Item>
+                </Menu.Item>
 
             </Menu>
-          );
+        );
 
         return (
             <AppLayoutContainer>
+                <Modal
+                    // title="Basic Modal"
+                    visible={this.state.alertModalVisibilityStatus}
+                    onOk={this.handleOk}
+                    onCancel={this.handleCancel}
+                >
+                    <div>
+                        Are you sure you want to leave the page?
+                    </div>
+                </Modal>
                 <AppLayoutSider
                     breakpoint="sm"
                     collapsible
@@ -167,16 +204,21 @@ class AppLayout extends React.PureComponent { // eslint-disable-line react/prefe
                     <Menu
                         theme="dark"
                         mode="inline"
-                        // selectedKeys={currentPath.match(/\//g).length === 1 ? [getRoute('dashboard').url] : [this.getKey(currentPath, '/', 3)]}
-                        // defaultOpenKeys={['/app']}
+                    // selectedKeys={currentPath.match(/\//g).length === 1 ? [getRoute('dashboard').url] : [this.getKey(currentPath, '/', 3)]}
+                    // defaultOpenKeys={['/app']}
                     >
                         {filteredRoutes.map((route) => (
                             <Menu.Item key={route.path}>
-                                <Link to={route.path} style={{ display: 'flex', alignItems: 'center' }}>
+                                {/* <Link to={route.path} style={{ display: 'flex', alignItems: 'center' }}>
                                     <Icon type={route.icon} />
                                     <span>{route.name}</span>
 
-                                </Link>
+                                </Link> */}
+
+                                <div style={{ display: "flex", alignItems: 'center' }} onClick={() => this.navigatePage(route)}>
+                                    {route.icon}
+                                    <span>{route.name}</span>
+                                </div>
 
                             </Menu.Item>
                         ))}
@@ -188,9 +230,15 @@ class AppLayout extends React.PureComponent { // eslint-disable-line react/prefe
                     <Header style={{ color: 'white' }}>
                         {displayUrl}
 
-                        <Dropdown overlay={menu} placement="topRight" style={{marginLeft:200}}  >
-                            <Button style={{marginRight:-400, marginLeft:400}}>Account</Button>
-                        </Dropdown>
+                        {/*<Dropdown overlay={menu} placement="topRight" style={{marginLeft:200}}  >*/}
+                        {/*    <Button style={{marginRight:-480, marginLeft:480}}>Account</Button>*/}
+                        {/*</Dropdown>*/}
+                        <Button target="_blank" rel="noopener noreferrer" onClick={this.handleAccountClick} style={{ position: "absolute", right: "120px", top: "16px" }}>
+                            Profile
+                        </Button>
+                        <Button target="_blank" rel="noopener noreferrer" onClick={this.handleSignoutClick} style={{ position: "absolute", right: "20px", top: "16px" }}>
+                            Log out
+                        </Button>
 
                     </Header>
 

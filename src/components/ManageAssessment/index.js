@@ -4,24 +4,22 @@
  *
  */
 
+import { Table } from "ant-table-extensions";
+import { Button, message } from 'antd';
 import React from 'react';
-import { Table, Button, Icon, Popconfirm, message } from 'antd';
 import {
-    manageStudentsApiResponse,
+    filterArray
+} from '../../utils/utilityFunctions';
+import {
+    manageStudentsApiResponse
 } from './ManageStudents.constants';
-
+import {
+    InputField, InputFilterContainer
+} from './ManageStudents.styled';
 import ManageStudentsAddEditModal from './ManageStudentsAddEditModal';
 
-import {
-    filterArray,
-} from '../../utils/utilityFunctions';
 
-import {
-    InputFilterContainer,
-    InputField,
-    IconContainer,
-    ActionContainer,
-} from './ManageStudents.styled';
+
 
 class ManageStudents extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
     constructor(props) {
@@ -41,18 +39,18 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
     getStudentListApiCAllFunction = () => {
         //api for get all stds
         // this.state.dataSource
-        
+
     }
-    startNewAssessment = () =>{
+    startNewAssessment = () => {
         console.log("start new assess");
-        this.props.history.push('/login'); 
+        this.props.history.push('/login');
     }
 
-    pastAssessment = () =>{
+    pastAssessment = () => {
         console.log("past assess");
-        this.props.history.push('/pastAssessment'); 
+        this.props.history.push('/pastAssessment');
     }
-    
+
     changeFilter = (event) => {
         this.setState({ filterValue: event.target.value });
     }
@@ -106,8 +104,9 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
             // },
             {
                 title: 'Organization Name',
-                dataIndex: 'organization.orgName',
+                dataIndex: 'organization',
                 key: 'organization',
+                render: text => <span>{text.orgName}</span>,
             },
             {
                 title: 'Coach Name',
@@ -126,7 +125,7 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
                 key: '',
                 render: () => <button onClick={() => this.pastAssessment()}>Past Assessment</button>,
             },
-            
+
         ];
 
         const { filterValue, dataSource, addEditModalStatus = '', addEditingStudentData } = this.state;
@@ -155,6 +154,7 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
                 <Table
                     dataSource={filteredDataSource}
                     columns={manageStudentsColumns}
+                    exportable
                 />
                 {addEditModalStatus && addEditModalStatus.length ? (
                     <ManageStudentsAddEditModal

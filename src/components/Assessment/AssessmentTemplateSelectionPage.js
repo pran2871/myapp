@@ -25,7 +25,8 @@ class AssessmentTemplateSelectionPage extends React.PureComponent { // eslint-di
 
         console.log('history : ', this.props.history);
         console.log('studentId : ', this.state.studentId);
-        const { studentId } = this.state;
+        const { studentId } = this.state.studentId;
+        
 
         return (
               <div>
@@ -34,8 +35,8 @@ class AssessmentTemplateSelectionPage extends React.PureComponent { // eslint-di
                     <Tabs.TabPane tab="Pick you template" key="1">
                       <PickTemplate {...this.props} studentId={studentId} />
                     </Tabs.TabPane>
-                    <Tabs.TabPane tab="create you own question list" key="2">
-                      <Contact />
+                    <Tabs.TabPane tab="Create you own question list" key="2">
+                      <Contact {...this.props} studentId={studentId}/>
                     </Tabs.TabPane>
                   </Tabs>
             

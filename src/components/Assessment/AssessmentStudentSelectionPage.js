@@ -41,7 +41,7 @@ import axios from 'axios';
 import {
     manageStudentsApiResponse,
 } from './ManageStudents.constants';
-
+import {ACCESS_TOKEN_NAME} from "../../constants/apiConstants";
 import ManageStudentsAddEditModal from './ManageStudentsAddEditModal';
 
 import {
@@ -63,16 +63,17 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
             dataSource: [],
             addEditModalStatus: '',
             addEditingStudentData: null,
-            
+
         }
     }
 
     componentDidMount() {
+        console.log("hello")
         this.getStudentListApiCAllFunction();
     }
 
     getStudentListApiCAllFunction = () => {
-       
+
 
        // http://localhost:8080/manageStudents/getAll
         const apiCallPromise = axios.get("/manageStudents/getAll")
@@ -92,7 +93,7 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
     })
     .catch(function (error) {
         console.log(error);
-    });  
+    });
 
     // using .then, create a new apiCallPromise which extracts the data
     apiCallPromise.then((response) => {
@@ -105,18 +106,27 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
     }
 
     //deleteStudent = (studentId) => {
-    startNewAssessment = (data) =>{
+    startNewAssessment = (data,data1) =>{
         this.setState({
             addEditingStudentData: data
         });
-        console.log("start new assess"+this.state.addEditingStudentData);
-       // this.props.history.push(`/assessment/:${data}`); 
-       this.props.history.push(`/assessment/`+data); 
+        localStorage.setItem('testName',data)
+        console.log(data)
+        console.log(data1)
+        console.log("start new assess"+data+" "+data1);
+       // this.props.history.push(`/assessment/:${data}`);
+       this.props.history.push(`/assessment/`+data);
     }
 
-    pastAssessment = (studentReferenceNumber) =>{
-        console.log("past assess");
-        this.props.history.push('/pastAssessment'); 
+    pastAssessment = (data,data1) =>{
+        console.log("past assess "+data);
+        this.setState({
+            addEditingStudentData: data
+        });
+        localStorage.setItem('testName',data)
+        console.log(data)
+        console.log(data1)
+        this.props.history.push(`/assessment/pastassessment/`+data);
     }
 
     changeFilter = (event) => {
@@ -142,7 +152,7 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
     }
 
     deleteStudent = (studentId) => {
-       
+
         console.log("delete")
         const apiCallPromise = axios.get("manageOrganization/delete/")
         .then(function (response) {
@@ -178,11 +188,17 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
                 title: 'Name',
                 dataIndex: 'studentName',
                 key: 'studentName',
+                sorter: (a, b) => {
+                    a = a.studentName || '';
+                    b = b.studentName || '';
+                return a.localeCompare(b)
+            },
             },
             {
                 title: 'Reference ID',
                 dataIndex: 'studentReferenceNumber',
                 key: 'studentReferenceNumber',
+
             },
             // {
             //     title: 'Address',
@@ -193,23 +209,37 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
                 title: 'Organization Name',
                 dataIndex: 'organizationName',
                 key: 'organizationName',
+                sorter: (a, b) => {
+                    a = a.organizationName || '';
+                    b = b.organizationName || '';
+                return a.localeCompare(b)
+            },
             },
             {
                 title: 'Coach Name',
                 dataIndex: 'coachName',
                 key: 'coachName',
+                sorter: (a, b) => {
+                    a = a.coachName || '';
+                    b = b.coachName || '';
+                return a.localeCompare(b)
+            },
             },
             {
                 title: 'Actions',
                 dataIndex: 'studentID',
+                dataIndex: 'studentName',
                 key: 'studentID',
-                render: (studentID) => <button onClick={() => this.startNewAssessment(studentID)} >Start New Assessment</button>,
+                render: (studentID,studentName) => <Button onClick={() => this.startNewAssessment(studentID,studentName)
+
+                } >Start New Assessment</Button>,
             },
             {
                 title: '',
-                dataIndex: '',
-                key: '',
-                render: () => <button onClick={() => this.pastAssessment()}>Past Assessment</button>,
+                dataIndex: 'studentID',
+                dataIndex: 'studentName',
+                key: 'studentID',
+                render: (studentID,studentName) => <Button onClick={() => this.pastAssessment(studentID,studentName)}>Past Assessment</Button>,
             },
         ];
 
@@ -229,7 +259,7 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
                         value={filterValue}
                         placeholder="Enter Filter"
                     />
-                    
+
                 </InputFilterContainer>
                 <Table
                     dataSource={filteredDataSource}

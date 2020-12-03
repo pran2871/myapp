@@ -8,7 +8,7 @@ import React from 'react';
 import { Button, Modal, Input } from 'antd';
 import axios from 'axios';
 import SelectDropDownComponent from '../SelectDropDownComponent';
-
+import {ACCESS_TOKEN_NAME} from "../../constants/apiConstants";
 import {
     FieldContainer,
 } from './ManageStudents.styled';
@@ -37,7 +37,7 @@ class ManageStudentsAddEdit extends React.PureComponent { // eslint-disable-line
 
     componentDidMount() {
 
-       
+
         //http://localhost:8080/manageOrganization/getAll/
         const apiCallPromise = axios.get("/manageOrganization/getAll/")
         .then(function (response) {
@@ -58,7 +58,7 @@ class ManageStudentsAddEdit extends React.PureComponent { // eslint-disable-line
     })
     .catch(function (error) {
         console.log(error);
-    });  
+    });
 
     // using .then, create a new apiCallPromise which extracts the data
     apiCallPromise.then((response) => {
@@ -93,7 +93,7 @@ class ManageStudentsAddEdit extends React.PureComponent { // eslint-disable-line
     changeFilter = (value, fieldId) => {
         if (fieldId === 'organization') {
                        //http://localhost:8080/manageStudents/getCoaches?orgID=1
-            //var id = 
+            //var id =
             const apiCallPromise = axios.get(`manageStudents/getCoaches?orgID=${this.state.addEditingStudentData.organization}`)
         .then(function (response) {
             console.log(response)
@@ -111,7 +111,7 @@ class ManageStudentsAddEdit extends React.PureComponent { // eslint-disable-line
     })
     .catch(function (error) {
         console.log(error);
-    });  
+    });
 
     // using .then, create a new apiCallPromise which extracts the data
     apiCallPromise.then((response) => {
@@ -120,7 +120,7 @@ class ManageStudentsAddEdit extends React.PureComponent { // eslint-disable-line
       // [{name: 'a', b: 'b'}, {name: 'c', d: 'd'}]
 
 
-      
+
       this.setState({
         addEditingStudentData: {
             ...this.state.addEditingStudentData,
@@ -132,7 +132,7 @@ class ManageStudentsAddEdit extends React.PureComponent { // eslint-disable-line
 
     })
 
-            
+
 
 
         } else {
@@ -146,18 +146,18 @@ class ManageStudentsAddEdit extends React.PureComponent { // eslint-disable-line
     submit = () => {
         console.log('addEditingStudentData : ', this.state.addEditingStudentData);
         console.log('addEditModalStatus : ', this.props.addEditModalStatus);
-        
-        
+
+
         //http://localhost:8080/manageOrganization/add/
         //http://localhost:8080/manageOrganization/update/
-        
-       
-       
+
+
+
         axios.post(this.props.addEditModalStatus === 'add' ? '/manageOrganization/add/' : '/manageOrganization/update/', this.state.addEditingStudentData)
            .then(function (response) {
-                console.log(response);   
+                console.log(response);
             });
-            
+
         this.props.updateListingData();
     }
 

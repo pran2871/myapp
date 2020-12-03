@@ -3,14 +3,15 @@
 
 // const About = () => (
 //   <div style={styles.container}>
-    
-//     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p> 
+
+//     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 //   </div>
 // )
 
 // export default About
 
 import React from 'react';
+import {ACCESS_TOKEN_NAME} from "../../constants/apiConstants";
 import { Table, Button, Icon, Popconfirm, message } from 'antd';
 import axios from 'axios';
 import styles from './styles'
@@ -40,19 +41,19 @@ class PickTemplate extends React.PureComponent { // eslint-disable-line react/pr
             addEditModalStatus: '',
             addEditingStudentData: null,
             deleteData:null,
-            studentID:''
-            
+
+
         }
     }
-    
+
     componentDidMount() {
       console.log('pick ur template')
-      
+      console.log(this.state.studentID)
         this.getStudentListApiCAllFunction();
     }
 
     getStudentListApiCAllFunction = () => {
-       
+
 
        // http://localhost:8080/manageStudents/getAll
         const apiCallPromise = axios.get("/manageTemplate")
@@ -72,7 +73,7 @@ class PickTemplate extends React.PureComponent { // eslint-disable-line react/pr
     })
     .catch(function (error) {
         console.log(error);
-    });  
+    });
 
     // using .then, create a new apiCallPromise which extracts the data
     apiCallPromise.then((response) => {
@@ -107,8 +108,9 @@ class PickTemplate extends React.PureComponent { // eslint-disable-line react/pr
     console.log("studentID from ",this.state)
     console.log(data);
     console.log('history props : ', this.props);
-    this.props.history.push(`/assessment/${data}/${data}`); 
-    //this.props.history.push(`/assessment/1/`+data); 
+    localStorage.setItem('testtemplate',data)
+    this.props.history.push(`/assessment/${data}/${data}`);
+    //this.props.history.push(`/assessment/1/`+data);
     }
 
     cancelAddEdit = () => {
@@ -119,7 +121,7 @@ class PickTemplate extends React.PureComponent { // eslint-disable-line react/pr
     }
 
     deleteStudent = (data) => {
-       
+
         console.log("delete"+data)
         this.setState({
             addEditModalStatus: 'edit',
@@ -160,18 +162,27 @@ class PickTemplate extends React.PureComponent { // eslint-disable-line react/pr
                 title: 'Template Name',
                 dataIndex: 'templateName',
                 key: 'templateName',
-            
+                sorter: (a, b) => {
+                    a = a.templateName || '';
+                    b = b.templateName || '';
+                return a.localeCompare(b)
+            },
             },
             {
                 title: 'Created By',
                 dataIndex: 'createdBY.userName',
                 key: 'createdBY.userName',
+                sorter: (a, b) => {
+                    a = a.createdBY.userName || '';
+                    b = b.createdBY.userName || '';
+                return a.localeCompare(b)
+            },
             },
             {
               title: '',
-              dataIndex: 'studentID',
-                key: 'studentID',
-              render: (studentID) => <button onClick={() => this.selectTemplate(studentID)}>Start</button>,
+              dataIndex: 'templateID',
+                key: 'templateID',
+              render: (templateID) => <Button onClick={() => this.selectTemplate(templateID)}>Start</Button>,
           },
             // {
             //     title: 'Address',
@@ -188,7 +199,7 @@ class PickTemplate extends React.PureComponent { // eslint-disable-line react/pr
             //     dataIndex: 'userID',
             //     key: 'userID',
             // },
-            
+
         ];
 
         const { filterValue, dataSource, addEditModalStatus = '', addEditingStudentData } = this.state;
@@ -207,7 +218,7 @@ class PickTemplate extends React.PureComponent { // eslint-disable-line react/pr
                         value={filterValue}
                         placeholder="Enter Filter"
                     />
-                    
+
                 </InputFilterContainer>
                 <Table
                     dataSource={filteredDataSource}

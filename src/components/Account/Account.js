@@ -1,334 +1,258 @@
-import React, {useState, Component, useEffect, useCallback} from 'react';
-//  import { withRouter } from "react-router-dom";
-//sidebar
-import Home from "../../Home";
-
-import { Input, Button ,message} from 'antd';
-
+import React from 'react';
+import {Button, Form, Input, message} from 'antd';
 import {
-    FormContainer,
-    FormInnerContainer,
-    FieldContainer,
-} from './Account.styled';
+    EyeInvisibleOutlined,
+    EyeTwoTone,
+    GlobalOutlined,
+    LockOutlined,
+    MailOutlined,
+    PhoneOutlined,
+    TeamOutlined,
+    UserOutlined
+} from '@ant-design/icons';
 
 import axios from 'axios';
 
+let confirmDirty = false;
 
+function Account(props) {
+    const handleConfirmBlurPassword = e => {
+        const {value} = e.target;
 
-function Account(props){
-    const { userId } = props;
+        confirmDirty = value !== null && value !== '' && value !== undefined;
 
-    const [response, setApiResponse] = useState();
-    
-    const [fieldValues , setFieldValues] = useState({
-        name : '',
-        // lastName: '',
-        contact: '',
-        email: '',
-        organization: '',
-        role: '',
-        id: '',
-    });
+        props.form.validateFields(['confirmpassword'], {
+            force: true
+        });
+    };
 
+    const compareToFirstPassword = (rule, value, callback) => {
+        if (value !== null && value !== '' && value !== undefined && value !== props.form.getFieldValue('password')) {
+            callback('Incorrect Confirm Password');
+        } else {
+            callback();
+        }
+    };
 
-    const [isEditState, setIsEditState] = useState(false);
+    const validateToNextPassword = (rule, value, callback) => {
+        if (value === null || value === '' || value === undefined) {
+            confirmDirty = false;
+        }
 
-//     createdAt: null
-// emailID: "akashmalla307@gmail.com"
-// updatedAt: null
-// userContactNo: "123"
-// userID: 1
-// userName: "akash"
-    const setResponseToFormValues = (userData) => {
-        console.log(userData)
-        //setting api response to the form values
-        setFieldValues({
-            name : localStorage.getItem('userName') || '',
-        
-            contact: localStorage.getItem('userContactNo') || '',
-            email: localStorage.getItem('emailID') || '',
-           // organization: userData.orgName || '',
-           // role: userData.roleName || '',
-            // id: response.id,
+        props.form.validateFields(['confirmpassword'], {
+            force: true
         });
 
-    }
+        callback();
+    };
 
-    
-    const getUserDetails = useCallback(async () => {
-        //console.log('Entered getUserDetails')
-        //  await api call
-        //console.log('Executing this function')
-        
-        const apiCallPromise = axios.get("/manageUser/?email_id=akashmalla307@gmail.com")
-            .then(function (response1) {
-                //console.log(response)
-                if(response1.status === 200){
-                    console.log(response1.data.data)
-                return response1.data.data;
-                } else{
-                    console.log('error');
+    const saveEdit = e => {
+        e.preventDefault();
+
+        props.form.validateFields((err, values) => {
+            // console.log('Received values of form: ', values);
+
+            if (!err) {
+                const payload = {
+                    "userName": values.name,
+                    "emailID": values.email,
+                    "userContactNo": values.contactNo,
+                    "password": values.password,
+                    "confirmpassword": values.confirmpassword,
+                    "userID": localStorage.getItem('userID')
                 }
-            })
-            .catch(function (error) {
-                console.log(error);
-            }); 
-            
-        apiCallPromise.then((apiResponse) => {
 
-            console.log('apiResponse : ', apiResponse);
-            
-            //if (apiResponse && apiResponse.user) {
-                setApiResponse(apiResponse);
-                console.log('apiResponse : ', apiResponse);
-                setResponseToFormValues(apiResponse);
-           // }
-        })
-        //  setApiResponse(response);
-            
-    }, [userId]);
-    
-    useEffect(() => {
-        getUserDetails();
-    }, [getUserDetails]);
+                const reply = axios.patch("/manageUser/profile?user_id=" + localStorage.getItem('userID'), payload).then(response => {
+                    if (response.status === 200) {
+                        if (response.data.status === "error") {
+                            message.error(response.data.message);
+                        } else {
+                            if (response.data.message !== "") {
+                                message.success(response.data.message);
+                            }
 
-    
-    const changeField = (value, fieldId) => {
-        setFieldValues(
-            {
-                ...fieldValues,
-                [fieldId]: value,
+                            localStorage.setItem('userName', values.name);
+                            localStorage.setItem('emailID', values.email);
+                            localStorage.setItem('userContactNo', values.contactNo);
+                        }
+                    } else {
+                        message.error("Something went wrong");
+                    }
+                }).catch(error => {
+                    if (error.response !== undefined && (error.response.status === 401 || error.response.status === 403)) {
+                        localStorage.clear();
+                        message.error("You were logged out!");
+                        props.history.push('/login');
+                    } else {
+                        message.error("Unable to contact server");
+                    }
+                });
             }
-        );
+        });
     }
 
-    const saveEdit = () => {
-        
-        console.log('field values : ', fieldValues);
-        console.log("hi im in save")
-        const payload={
-            "userName":fieldValues.name,
-            "emailID":fieldValues.email,
-            
-            "password":localStorage.getItem('password')
-            
-        }
-        console.log(payload);
-        const reply = axios.patch("/manageUser/updateAccount",payload)
-            .then(function (response) 
-            {
-            console.log(response)
-            console.log(response.data)
-            //console.log(response.data.data.name)
-            //name1 = response.data.data.name
-            console.log(response.data.status)
-            //console.log(response.data.data.roleName)
-            if(response.status === 200){
-                
-                if(response.data.status ==='error')
-                {
-                    console.log("qqqqqqqqqqqqq")
-                    props.showError("User does not exists");
-                }
-                console.log("hiiiiiiiiiiii")
-                props.showError(null)
-            }
-            
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
-            reply.then((response) => {
-                message.success("Organisation successfully added");
-                props.history.push('/landing');
-            })
-    }
+    const formItemLayout = {
+        labelCol: {
+            xs: {span: 8},
+            sm: {span: 8},
+        },
+        wrapperCol: {
+            xs: {span: 8},
+            sm: {span: 8},
+        },
+    };
+    const tailFormItemLayout = {
+        wrapperCol: {
+            xs: {
+                span: 8,
+                offset: 0,
+            },
+            sm: {
+                span: 8,
+                offset: 8,
+            },
+        },
+    };
 
-    const toggleEdit = () => {
-        setIsEditState(!isEditState);
-    }
-
-
-    const cancelEdit = () => {
-        setResponseToFormValues(response);
-        
-        toggleEdit();
-    }
+    const {getFieldDecorator} = props.form;
 
     return (
-        <FormContainer>
-            <FormInnerContainer>
-            <FieldContainer>
-            <p>{!isEditState? '' : 'Enter Name'}</p>
-                    <Input
-                        onChange={(event) => changeField(event.target.value, 'name')}
-                        value={fieldValues.name}
-                        disabled={!isEditState}
-                        placeholder="Name"
-                    />
-                </FieldContainer>
-                <FieldContainer>
-                <p>{!isEditState  ? '' : 'Enter Email'}</p>
-                    <Input
-                        onChange={(event) => changeField(event.target.value, 'email')}
-                        value={fieldValues.email}
-                        disabled={!isEditState}
-                        placeholder="Email"
-                    />
-                </FieldContainer>
-                <FieldContainer>
-                <p>{!isEditState ? '' : 'Enter Role'}</p>
-                    <Input
-                        onChange={(event) => changeField(event.target.value, 'role')}
-                        value={localStorage.getItem('roleName')}
-                        disabled={true}
-                        placeholder="Role"
-                    />
-                </FieldContainer>
-                <FieldContainer>
-                <p>{!isEditState ? '' : 'Enter Organisation'}</p>
-                    <Input
-                        onChange={(event) => changeField(event.target.value, 'organisation')}
-                        value={localStorage.getItem('orgName')}
-                        disabled={true}
-                        placeholder="Organisation"
-                    />
-                </FieldContainer>
-                
-                {isEditState ? (
-                            <div>
-                                <Button onClick={cancelEdit}>
-                                    cancel
-                                </Button>
-                                <Button onClick={saveEdit}>
-                                    Save
-                                </Button>
-                            </div>
-                        ) : (
-                            <Button onClick={toggleEdit}>
-                                Edit
-                            </Button>
-                        )}
-            </FormInnerContainer>
-        </FormContainer>
+        <Form {...formItemLayout} onSubmit={saveEdit}>
+            <Form.Item label="Name" hasFeedback>
+                {
+                    getFieldDecorator(
+                        'name',
+                        {
+                            rules: [{
+                                required: true,
+                                message: 'Name is required'
+                            }],
+                            initialValue: localStorage.getItem('userName') || ''
+                        }
+                    )(
+                        <Input
+                            allowClear
+                            prefix={<UserOutlined/>}
+                            placeholder="Enter Name"
+                        />,
+                    )
+                }
+            </Form.Item>
+            <Form.Item label="Email ID" hasFeedback>
+                {
+                    getFieldDecorator(
+                        'email',
+                        {
+                            rules: [{
+                                required: true,
+                                message: 'Email ID is required'
+                            }, {
+                                pattern: /^[^\s@]+@[^\s@]+\.([^\s@1-9]){2,}$/,
+                                message: 'Invalid Email ID',
+                            }],
+                            initialValue: localStorage.getItem('emailID') || ''
+                        }
+                    )(
+                        <Input
+                            allowClear
+                            prefix={<MailOutlined/>}
+                            placeholder="Enter Email ID"
+                        />,
+                    )
+                }
+            </Form.Item>
+            <Form.Item label="Password" hasFeedback>
+                {
+                    getFieldDecorator(
+                        'password',
+                        {
+                            rules: [{
+                                min: 8,
+                                message: 'Password must be between 8 and 12 characters'
+                            }, {
+                                max: 12,
+                                message: 'Password must be between 8 and 12 characters'
+                            }, {
+                                validator: validateToNextPassword,
+                            }],
+                            initialValue: ''
+                        }
+                    )(
+                        <Input.Password
+                            prefix={<LockOutlined/>}
+                            autocomplete="new-password"
+                            placeholder="Enter Password"
+                            onChange={handleConfirmBlurPassword}
+                            onKeyUp={handleConfirmBlurPassword}
+                            iconRender={visible => (visible ? <EyeTwoTone/> : <EyeInvisibleOutlined/>)}
+                        />,
+                    )
+                }
+            </Form.Item>
+            <Form.Item label="Confirm Password" hasFeedback>
+                {
+                    getFieldDecorator(
+                        'confirmpassword',
+                        {
+                            rules: [{
+                                required: confirmDirty,
+                                message: 'Please confirm your password!'
+                            }, {
+                                validator: compareToFirstPassword,
+                            }],
+                            initialValue: ''
+                        }
+                    )(
+                        <Input.Password
+                            prefix={<LockOutlined/>}
+                            autocomplete="new-password"
+                            placeholder="Confirm Password"
+                            iconRender={visible => (visible ? <EyeTwoTone/> : <EyeInvisibleOutlined/>)}
+                        />,
+                    )
+                }
+            </Form.Item>
+            <Form.Item label="Contact Number" hasFeedback>
+                {
+                    getFieldDecorator(
+                        'contactNo',
+                        {
+                            rules: [{
+                                pattern: /^[0-9]{8,10}$/,
+                                message: 'Invalid Contact Number'
+                            }],
+                            initialValue: localStorage.getItem('userContactNo') !== 'null' ? localStorage.getItem('userContactNo') : ''
+                        }
+                    )(
+                        <Input
+                            allowClear
+                            prefix={<PhoneOutlined/>}
+                            placeholder="Enter Contact Number"
+                        />,
+                    )
+                }
+            </Form.Item>
+            <Form.Item label="Role">
+                <Input
+                    disabled={true}
+                    prefix={<TeamOutlined/>}
+                    value={localStorage.getItem('roleName')}
+                />
+            </Form.Item>
+            <Form.Item label="Organization">
+                <Input
+                    disabled={true}
+                    prefix={<GlobalOutlined/>}
+                    value={localStorage.getItem('orgName') !== 'null' ? localStorage.getItem('orgName') : ''}
+                />
+            </Form.Item>
+            <Form.Item {...tailFormItemLayout} >
+                <Button type="primary" htmlType="submit">
+                    Save
+                </Button>
+            </Form.Item>
+        </Form>
     );
-
-    // return(
-        
-    //     <div className="card col-12 col-lg-4 login-card mt-2 hv-center">
-    //         <form>
-    //             <div className="form-group text-left">
-                
-    //             <input type="text" 
-    //                    className="form-control" 
-    //                    id="name" 
-    //                    aria-describedby="emailHelp" 
-    //                    //placeholder="Name" 
-    //                    //value={state.password}
-    //                    onChange={(event) => changeField(event.target.value, 'name')}
-    //                    value={fieldValues.name}
-    //                    disabled={!isEditState}
-                       
-    //             />
-    //             <Input
-    //                 onChange={(event) => changeField(event.target.value, 'name')}
-    //                 value={fieldValues.name}
-    //                 disabled={!isEditState}
-    //                 placeholder="Name"
-    //             />
-    //             </div>
-
-                
-
-    //             <div className="form-group text-left">
-                
-    //             <input type="text" 
-    //                    className="form-control" 
-    //                    id="contact" 
-    //                    aria-describedby="emailHelp" 
-    //                    //placeholder="Last Name" 
-    //                    //value={state.password}
-                       
-    //                    disabled={!isEditState}
-    //                    onChange={(event) => changeField(event.target.value, 'contact')}
-    //                    value={fieldValues.contact}
-    //             />
-    //             </div>
-
-    //             <div className="form-group text-left">
-                
-    //             <input type="text" 
-    //                    className="form-control" 
-    //                    id="email" 
-    //                 //    placeholder="email"
-    //                     disabled={!isEditState}
-    //                     onChange={(event) => changeField(event.target.value, 'email')}
-    //                     value={fieldValues.email}
-    //             />
-    //             </div>
-
-    //             <div className="form-group text-left">
-                
-    //             <input type="text" 
-    //                    className="form-control" 
-    //                    id="orgname" 
-    //                 //    placeholder="Org Name"
-    //                 //    value={state.confirmpassword}
-                       
-    //                    disabled={true}
-    //                    onChange={(event) => changeField(event.target.value, 'organization')}
-    //                    value={fieldValues.organization}
-    //             />
-    //             </div>
-
-    //             <div className="form-group text-left">
-                
-    //             <input type="text" 
-    //                    className="form-control" 
-    //                    id="role" 
-    //                 //    placeholder="Role"
-    //                 //    value={state.confirmpassword}
-                        
-    //                    disabled={true}
-    //                    onChange={(event) => changeField(event.target.value, 'role')} 
-    //                    value={fieldValues.role}
-    //             />
-    //             </div>
-
-                
-
-    //             <div className="form-check">
-    //             </div>
-    //             {/* <button 
-    //                 type="submit" 
-    //                 className="btn btn-primary"
-    //                 onClick={handleSubmitClick}
-    //             >Edit</button> */}
-    //             {/* edit */}
-    //             <div>
-    //                 {isEditState ? (
-    //                     <div>
-    //                         <Button onClick={cancelEdit}>
-    //                             cancel
-    //                         </Button>
-    //                         <Button onClick={saveEdit}>
-    //                             Save
-    //                         </Button>
-    //                     </div>
-    //                 ) : (
-    //                     <Button onClick={toggleEdit}>
-    //                         Edit
-    //                     </Button>
-    //                 )}
-    //             </div>
-    //         </form>
-            
-    //         {/* <div className="alert alert-success mt-2" style={{display: state.successMessage ? 'block' : 'none' }} role="alert">
-    //             {state.successMessage}
-    //         </div> */}
-            
-    //     </div>
-        
-    // )
 }
-export default Account;
+
+export default Form.create()(Account);

@@ -4,25 +4,21 @@
  *
  */
 
-import React from 'react';
-import { Table, Button, Icon, Popconfirm, message } from 'antd';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { Table } from "ant-table-extensions";
+import { Button, message, Popconfirm } from 'antd';
 import axios from 'axios';
+import React from 'react';
+import { ACCESS_TOKEN_NAME } from "../../constants/apiConstants";
 import {
-    manageStudentsApiResponse,
-} from './ManageStudents.constants';
-
+    filterArray
+} from '../../utils/utilityFunctions';
+import {
+    ActionContainer, IconContainer, InputField, InputFilterContainer
+} from './ManageStudents.styled';
 import ManageStudentsAddEditModal from './ManageStudentsAddEditModal';
 
-import {
-    filterArray,
-} from '../../utils/utilityFunctions';
 
-import {
-    InputFilterContainer,
-    InputField,
-    IconContainer,
-    ActionContainer,
-} from './ManageStudents.styled';
 
 class ManageStudents extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
     constructor(props) {
@@ -32,8 +28,8 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
             dataSource: [],
             addEditModalStatus: '',
             addEditingStudentData: null,
-            deleteData:null,
-            
+            deleteData: null,
+
         }
     }
 
@@ -45,42 +41,41 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
         //  ToDo: api call for the list of students data and save the data in this.state.dataSource
 
         console.log("inside getStudentApi Call function 2")
-       // http://localhost:8080/manageStudents/getAll
+        // http://localhost:8080/manageStudents/getAll
         const apiCallPromise = axios.get("/manageStudents/getAll")
-        .then(function (response) {
-            console.log(response)
-            console.log(response.status)
-            console.log(response.data.data)
-            //console.log(this.state.dataSource)
-            console.log("akash")
-        if(response.status === 200){
-            //this.setState({ dataSource: response.data.data });
-            //this.state.dataSource = response.data.data;
-            if(response.data.status ==='error')
-            {                        
-                console.log(response.data.message);
-                message.error(response.data.message);
-                
-            }else{
-            return response.data.data;
-            }
-        } else{
-            console.log('error');
-            message.error(response.data.message);
-        }
-    })
-    .catch(function (error) {
-        console.log(error);
-    });  
+            .then(function (response) {
+                console.log(response)
+                console.log(response.status)
+                console.log(response.data.data)
+                //console.log(this.state.dataSource)
+                console.log("akash")
+                if (response.status === 200) {
+                    //this.setState({ dataSource: response.data.data });
+                    //this.state.dataSource = response.data.data;
+                    if (response.data.status === 'error') {
+                        console.log(response.data.message);
+                        message.error(response.data.message);
 
-    // using .then, create a new apiCallPromise which extracts the data
-    apiCallPromise.then((response) => {
+                    } else {
+                        return response.data.data;
+                    }
+                } else {
+                    console.log('error');
+                    message.error(response.data.message);
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
 
-      console.log('response.data.data : ', response);
-      // [{name: 'a', b: 'b'}, {name: 'c', d: 'd'}]
+        // using .then, create a new apiCallPromise which extracts the data
+        apiCallPromise.then((response) => {
 
-      this.setState({ dataSource: response });
-    })
+            console.log('response.data.data : ', response);
+            // [{name: 'a', b: 'b'}, {name: 'c', d: 'd'}]
+
+            this.setState({ dataSource: response });
+        })
 
     }
 
@@ -108,7 +103,7 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
 
     deleteStudent = (data) => {
         //  ToDo: delete api call
-        console.log("delete"+data)
+        console.log("delete" + data)
         this.setState({
             addEditModalStatus: '',
             deleteData: data
@@ -116,29 +111,29 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
         console.log(this.state.deleteData)
         console.log(data)
         //?email_id="+payload.email
-        const apiCallPromise = axios.delete("manageStudents/delete?studentReferenceNumber="+data)
-        .then(function (response) {
-            console.log("inside delete function")
-            console.log(response)
-            console.log(response.status)
-            console.log(response.data.data)
-            //console.log(this.state.dataSource)
-            console.log("akash")
-        if(response.status === 200){
-            //this.setState({ dataSource: response.data.data });
-            //this.state.dataSource = response.data.data;
-            return response.data.data;
-        } else{
-            console.log('error');
-        }
-    })
-    .catch(function (error) {
-        console.log(error);
-    });
-    apiCallPromise.then((response) => {
-        message.success("Student deleted successfully");
-        this.updateListingData();
-    })
+        const apiCallPromise = axios.delete("manageStudents/delete?studentReferenceNumber=" + data)
+            .then(function (response) {
+                console.log("inside delete function")
+                console.log(response)
+                console.log(response.status)
+                console.log(response.data.data)
+                //console.log(this.state.dataSource)
+                console.log("akash")
+                if (response.status === 200) {
+                    //this.setState({ dataSource: response.data.data });
+                    //this.state.dataSource = response.data.data;
+                    return response.data.data;
+                } else {
+                    console.log('error');
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        apiCallPromise.then((response) => {
+            message.success("Student deleted successfully");
+            this.updateListingData();
+        })
 
         this.getStudentListApiCAllFunction();
     }
@@ -156,11 +151,21 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
                 title: 'Name',
                 dataIndex: 'studentName',
                 key: 'studentName',
+                sorter: (a, b) => {
+                    a = a.studentName || '';
+                    b = b.studentName || '';
+                    return a.localeCompare(b)
+                },
             },
             {
                 title: 'Reference ID',
                 dataIndex: 'studentReferenceNumber',
                 key: 'studentReferenceNumber',
+                sorter: (a, b) => {
+                    a = a.studentReferenceNumber || '';
+                    b = b.studentReferenceNumber || '';
+                    return a.localeCompare(b)
+                },
             },
             // {
             //     title: 'Address',
@@ -171,17 +176,29 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
                 title: 'Organization Name',
                 dataIndex: 'organizationName',
                 key: 'organizationName',
+                render: text => <span>{text}</span>,
+                sorter: (a, b) => {
+                    a = a.organizationName || '';
+                    b = b.organizationName || '';
+                    return a.localeCompare(b)
+                },
             },
             {
                 title: 'Coach Name',
                 dataIndex: 'coachName',
                 key: 'coachName',
+                render: text => <span>{text}</span>,
+                sorter: (a, b) => {
+                    a = a.coachName || '';
+                    b = b.coachName || '';
+                    return a.localeCompare(b)
+                },
             },
             {
                 title: 'Actions',
                 dataIndex: 'studentReferenceNumber',
                 key: 'studentReferenceNumber',
-                render: (studentReferenceNumber,studentData) => {
+                render: (studentReferenceNumber, studentData) => {
                     return (
                         <ActionContainer>
                             <IconContainer>
@@ -191,11 +208,11 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
                                     okText="Yes"
                                     cancelText="No"
                                 >
-                                    <Icon type={'delete'} />
+                                    <DeleteOutlined />
                                 </Popconfirm>
                             </IconContainer>
                             <IconContainer>
-                                <Icon type={'edit'} onClick={() => this.editStudentData(studentData)} />
+                                <EditOutlined onClick={() => this.editStudentData(studentData)} />
                             </IconContainer>
                         </ActionContainer>
                     );
@@ -229,6 +246,7 @@ class ManageStudents extends React.PureComponent { // eslint-disable-line react/
                 <Table
                     dataSource={filteredDataSource}
                     columns={manageStudentsColumns}
+                    exportable
                 />
                 {addEditModalStatus && addEditModalStatus.length ? (
                     <ManageStudentsAddEditModal

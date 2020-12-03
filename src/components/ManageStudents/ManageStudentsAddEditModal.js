@@ -5,10 +5,11 @@
  */
 
 import React from 'react';
-import { Button, Modal, Input, message } from 'antd';
+import {Button, Modal, Input, message, Form, Select} from 'antd';
 import axios from 'axios';
+import {withRouter} from 'react-router';
 import SelectDropDownComponent from '../SelectDropDownComponent';
-
+import {ACCESS_TOKEN_NAME} from "../../constants/apiConstants";
 import {
     FieldContainer,
 } from './ManageStudents.styled';
@@ -17,6 +18,9 @@ import {
     manageStudentsOrganizationResponse,
     manageStudentsCoachListResponse,
 } from './ManageStudents.constants';
+import {GlobalOutlined, UserOutlined} from "@ant-design/icons";
+
+const {Option} = Select;
 // {studentID: 1, studentReferenceNumber: 123, studentName: "sid1", studentContactNo: "123", orgID: 1, …}
 class ManageStudentsAddEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
     constructor(props) {
@@ -79,13 +83,14 @@ class ManageStudentsAddEdit extends React.PureComponent { // eslint-disable-line
 // {name: "qwe", referenceNumber: "1234", contactNumber: "1234", organization: "2", coach: "2"}
         const { addEditingStudentData } = this.props;
         if (addEditingStudentData) {
+            console.log(addEditingStudentData)
             this.setState({ addEditingStudentData: {
                 ...addEditingStudentData,
                 name: addEditingStudentData.studentName,
                 referenceNumber: addEditingStudentData.studentReferenceNumber,
                 contactNumber: addEditingStudentData.studentContactNo,
                 organization: addEditingStudentData.orgID,
-                coach: addEditingStudentData.userID
+                coach: addEditingStudentData.coachName
             }});
         }
     }
@@ -96,14 +101,17 @@ class ManageStudentsAddEdit extends React.PureComponent { // eslint-disable-line
     // "orgID":this.state.addEditingStudentData.organization
 
     changeFilter = (value, fieldId) => {
-        if (fieldId === 'organization') {
+        console.log("bkuvbkdsfvdvkdsjvjksdhvbjhdsfbvjsdfhbvlsdkvblsdbv");
+        if (fieldId === 'orgID') {
 
             //http://localhost:8080/manageStudents/getCoaches?orgID=1
-            //var id = 
+            //var id =
+            console.log(value);
             const apiCallPromise = axios.get(`manageStudents/getCoaches?orgID=${value}`)
         .then(function (response) {
             console.log(response)
             console.log(response.data.data)
+            console.log(response.data.data.user)
             //console.log(response.data.userName)
             //console.log(this.state.dataSource)
             console.log("akash")
@@ -136,6 +144,7 @@ class ManageStudentsAddEdit extends React.PureComponent { // eslint-disable-line
         coachList: response,
     });
 
+    console.log(this.state.coachList)
     })
         } else {
             this.setState({ addEditingStudentData: {
@@ -197,25 +206,13 @@ class ManageStudentsAddEdit extends React.PureComponent { // eslint-disable-line
 
     }
 
-    submit = () => {
-        console.log('addEditingStudentData : ', this.state.addEditingStudentData);
-        console.log('addEditModalStatus : ', this.props.addEditModalStatus);
-
-
-        //http://localhost:8080/manageOrganization/add/
-        //http://localhost:8080/manageOrganization/update/
-
-       console.log("student details");
-       console.log(this.state.addEditingStudentData);
-
-
-        // {studentID: 1, studentReferenceNumber: 123, studentName: "sid1", studentContactNo: "123", orgID: 1, …}
+    submit = (values) => {
         const payload={
-            "studentReferenceNumber" : this.state.addEditingStudentData.referenceNumber,
-            "studentName" : this.state.addEditingStudentData.name,
-            "studentContactNo" : this.state.addEditingStudentData.contactNumber,
-            "userID":this.state.addEditingStudentData.coachName,
-            "orgID":this.state.addEditingStudentData.organizationName
+            "studentReferenceNumber" : values.referenceNumber,
+            "studentName" : values.name,
+            "studentContactNo" : values.contactNumber,
+            "userID":values.coach,
+            "orgID":values.organization
         }
         console.log(payload)
         if(this.props.addEditModalStatus === 'add'){
@@ -223,12 +220,12 @@ class ManageStudentsAddEdit extends React.PureComponent { // eslint-disable-line
             console.log("inside add the student");
             console.log(payload);
             const reply = axios.post('/manageStudents/add',payload).then(function (response) {
-                console.log(response);  
-                console.log("updating Lists1");  
-                
+                console.log(response);
+                console.log("updating Lists1");
+
 
             });
-            
+
             reply.then((response) => {
                 message.success("Student successfully added");
                 this.props.updateListingData();
@@ -247,105 +244,239 @@ class ManageStudentsAddEdit extends React.PureComponent { // eslint-disable-line
                 this.props.updateListingData();
             })
         }
-        
-           //this.updateListingData()       
-        
+
+           //this.updateListingData()
+
     }
 
     render() {
 
         const { addEditingStudentData, organizationList = [], coachList = [] } = this.state;
         const { cancelAddEdit, addEditModalStatus } = this.props;
+        const {getFieldDecorator} = this.props.form;
+        const formItemLayout = {
+            labelCol: {
+                xs: {span: 8},
+                sm: {span: 8},
+            },
+            wrapperCol: {
+                xs: {span: 8},
+                sm: {span: 8},
+            },
+        };
 
         return (
             <Modal
-                title={addEditModalStatus === 'edit' ? 'Edit Student Data' : 'Add New Student'}
+                title={addEditModalStatus === 'edit' ? 'Edit Student' : 'Add New Student'}
                 visible={addEditModalStatus.length}
-                onOk={addEditModalStatus === 'edit' ? this.editStudentData : this.createNewStudent}
+                okText={addEditModalStatus === 'edit' ? 'Update' : 'Create'}
+                onOk={() => {
+                    this.props.form.validateFields().then(values => {
+                        this.submit(values);
+                    }).catch(info => {
+                        console.log("Validation Failed:", info);
+                    });
+                }}
+                cancelText="Cancel"
                 onCancel={cancelAddEdit}
-                footer={[
-                    <Button key="back" onClick={cancelAddEdit}>
-                        Cancel
-                    </Button>,
-                    <Button key="submit" type="primary" onClick={this.submit}>
-                        {addEditModalStatus === 'edit' ? 'Update' : 'Create'}
-                    </Button>,
-                ]}
             >
+                <Form {...formItemLayout}>
+                    <Form.Item label="Name" hasFeedback>
+                        {
+                            getFieldDecorator(
+                                'name',
+                                {
+                                    rules: [{
+                                        required: true,
+                                        message: 'Name is required'
+                                    }],
+                                    initialValue: addEditingStudentData.name
+                                }
+                            )(
+                                <Input
+                                    allowClear
+                                    prefix={<UserOutlined/>}
+                                    placeholder="Enter Name"
+                                />,
+                            )
+                        }
+                    </Form.Item>
+                    <Form.Item label="Reference Number" hasFeedback>
+                        {
+                            getFieldDecorator(
+                                'referenceNumber',
+                                {
+                                    rules: [{
+                                        required: true,
+                                        message: 'Reference Number is required'
+                                    }],
+                                    initialValue: addEditingStudentData.referenceNumber
+                                }
+                            )(
+                                <Input
+                                    allowClear
+                                    prefix={<UserOutlined/>}
+                                    placeholder="Enter Reference Number"
+                                />,
+                            )
+                        }
+                    </Form.Item>
+                    <Form.Item label="Contact Number" hasFeedback>
+                        {
+                            getFieldDecorator(
+                                'contactNumber',
+                                {
+                                    rules: [{
+                                        required: false,
+                                        message: 'Contact Number is required'
+                                    }],
+                                    initialValue: addEditingStudentData.contactNumber
+                                }
+                            )(
+                                <Input
+                                    allowClear
+                                    prefix={<UserOutlined/>}
+                                    placeholder="Enter Reference Number"
+                                />,
+                            )
+                        }
+                    </Form.Item>
+                    <Form.Item label="Organization" hasFeedback>
+                        {
+                            addEditModalStatus === 'add' ?
+                                getFieldDecorator(
+                                    'orgID',
+                                    {
+                                        rules: [{
+                                            required: true,
+                                            message: 'Please select an Organization',
+                                        }],
+                                    }
+                                )(
+                                    <Select
+                                        showSearch
+                                        allowClear
+                                        showArrow
+                                        
+                                        placeholder={
+                                            <React.Fragment>
+                                                <GlobalOutlined/>
+                                                &nbsp; Select Organization
+                                            </React.Fragment>
+                                        }
+                                        onChange={(value) => this.changeFilter(value, 'orgID')}
+                                    >
+                                        {
+                                            organizationList.map(organizationData =>
+                                                <Option value={organizationData.orgID}>
+                                                    {organizationData.orgName}
+                                                </Option>)
+                                        }
+                                    </Select>
+                                ) :
 
-                <FieldContainer>
-                    <p>{addEditModalStatus === 'add' ? '' : 'Enter Name'}</p>
-                    <Input
-                        onChange={(event) => this.changeFilter(event.target.value, 'name')}
-                        value={addEditingStudentData.name}
-                        placeholder="Enter Name"
-                    />
-                </FieldContainer>
-                <FieldContainer>
-                <p>{addEditModalStatus === 'add' ? '' : 'Enter Reference Number'}</p>
-                    <Input
-                    disabled={addEditModalStatus === 'edit'}
-                        onChange={(event) => this.changeFilter(event.target.value, 'referenceNumber')}
-                        value={addEditingStudentData.referenceNumber}
-                        placeholder="Enter Reference Number"
-                    />
-                </FieldContainer>
-                <FieldContainer>
-                <p>{addEditModalStatus === 'add' ? '' : 'Enter Contact Number'}</p>
-                    <Input
-                        onChange={(event) => this.changeFilter(event.target.value, 'contactNumber')}
-                        value={addEditingStudentData.contactNumber}
-                        placeholder="Enter Contact Number"
-                    />
-                </FieldContainer>
-                <FieldContainer>
-                <p>{addEditModalStatus === 'add' ? '' : 'Select Organisation'}</p>
-                    <SelectDropDownComponent
-                        //elmId="organization"
+                                getFieldDecorator(
+                                    'orgID',
+                                    {
+                                        rules: [{
+                                            required: true,
+                                            message: 'Please select an Organization',
+                                        }],
+                                        initialValue: addEditingStudentData.organization,
+                                    }
+                                )(
+                                    <Select
+                                        showSearch
+                                        allowClear
+                                        showArrow
+                                        placeholder={
+                                            <React.Fragment>
+                                                <GlobalOutlined/>
+                                                &nbsp; Select Organization
+                                            </React.Fragment>
+                                        }
+                                        onChange={(value) => this.changeFilter(value, 'orgID')}
+                                    >
+                                        {
+                                            organizationList.map(organizationData =>
+                                                <Option value={organizationData.orgID}>
+                                                    {organizationData.orgName}
+                                                </Option>)
+                                        }
+                                    </Select>
+                                )
+                        }
+                    </Form.Item>
+                    <Form.Item label="Coach" hasFeedback>
+                        {
+                            addEditModalStatus === 'add' ?
+                                getFieldDecorator(
+                                    'coachID',
+                                    {
+                                        rules: [{
+                                            required: true,
+                                            message: 'Please select a Coach',
+                                        }],
+                                    }
+                                )(
+                                    <Select
+                                        showSearch
+                                        allowClear
+                                        showArrow
+                                        placeholder={
+                                            <React.Fragment>
+                                                <GlobalOutlined/>
+                                                &nbsp; Select Coach
+                                            </React.Fragment>
+                                        }
+                                        
+                                    >
+                                        {
+                                            coachList.map(CoachData =>
+                                                <Option value={CoachData.user.userID}>
+                                                    {CoachData.user.userName}
+                                                </Option>)
+                                        }
+                                    </Select>
+                                ) :
 
-                        
-                        //disabled={addEditModalStatus === 'edit'}
-
-                        showSearch
-                        allowClear
-                        showArrow
-                        onChangeHandler={(value) => this.changeFilter(value, 'organization')}
-                        value={addEditingStudentData.organizationName}
-                        placeholder="Select Organization"
-                        options={organizationList.map((organizationData) => {
-                            return {
-                                id: organizationData.orgID,
-                                label: organizationData.orgName,
-                            }
-                        })}
-                    />
-                </FieldContainer>
-                <FieldContainer>
-                <p>{addEditModalStatus === 'add' ? '' : 'Select Coach'}</p>
-                    <SelectDropDownComponent
-
-                        //elmId="coach"
-                        // disabled={addEditModalStatus === 'edit'}
-                        //disabled={addEditModalStatus === 'edit'}
-
-                        showSearch
-                        allowClear
-                        showArrow
-                        onChangeHandler={(value) => this.changeFilter(value, 'coach')}
-                        value={addEditingStudentData.coachName}
-                        placeholder="Select Coach"
-                        options={coachList.map((CoachData) => {
-                            return {
-                                id: CoachData.coachID,
-                                label: CoachData.coachName,
-                            }
-                        })}
-                    />
-                </FieldContainer>
+                                getFieldDecorator(
+                                    'coachID',
+                                    {
+                                        rules: [{
+                                            required: true,
+                                            message: 'Please select a Coach',
+                                        }],
+                                        initialValue: addEditingStudentData.coach,
+                                    }
+                                )(
+                                    <Select
+                                        showSearch
+                                        allowClear
+                                        showArrow
+                                        placeholder={
+                                            <React.Fragment>
+                                                <GlobalOutlined/>
+                                                &nbsp; Select Coach
+                                            </React.Fragment>
+                                        }
+                                        
+                                    >
+                                        {
+                                            coachList.map(CoachData =>
+                                                <Option value={CoachData.user.userID}>
+                                                    {CoachData.user.userName}
+                                                </Option>)
+                                        }
+                                    </Select>
+                                )
+                        }
+                    </Form.Item>
+                </Form>
             </Modal>
         )
     }
 }
 
 
-export default ManageStudentsAddEdit;
+export default withRouter(Form.create()(ManageStudentsAddEdit));
